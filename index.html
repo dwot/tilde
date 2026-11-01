@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tilde</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%236aaa64'/><text x='16' y='27' font-size='28' text-anchor='middle' fill='white' font-family='monospace'>~</text></svg>" />
+  </head>
+  <body>
+    <header class="top">
+      <a href="#/" class="home"><h1>Tilde</h1></a>
+      <span id="meta" class="meta"></span>
+      <nav>
+        <a href="#/sheet" id="nav-sheet" class="nav-link">Cheat sheet</a>
+        <span id="star-total" class="star-total" title="Stars earned"></span>
+      </nav>
+    </header>
+
+    <main id="map-view" class="map hidden"></main>
+    <main id="sheet-view" class="sheet hidden"></main>
+
+    <main id="level-view" class="play hidden">
+      <section class="brief">
+        <h2 id="title"></h2>
+        <div id="goal" class="goal"></div>
+        <div class="actions">
+          <button id="btn-check" class="primary" disabled>Check</button>
+          <button id="btn-reset" class="ghost" disabled>Start over</button>
+        </div>
+        <div id="result" class="result"></div>
+        <div id="help" class="help">
+          <p id="stakes" class="stakes"></p>
+          <div class="help-buttons">
+            <button id="btn-tools" class="ghost">Toolbox</button>
+            <button id="btn-steps" class="ghost">Walk me through it</button>
+          </div>
+          <div id="tools" class="card" hidden></div>
+          <div id="steps" class="card" hidden></div>
+        </div>
+      </section>
+      <section class="terminal-wrap">
+        <div id="terminal"></div>
+        <div id="overlay" class="overlay">
+          <div class="spinner"></div>
+          <p id="overlay-text">Downloading Linux…</p>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,7 @@
+#!/bin/sh
+# The player's terminal on ttyS0. init respawns it, so the game resets a level by killing the player's processes.
+# While a reset is still building the level's files, wait, so the new shell starts in the finished ~/work.
+while [ -e /var/game/resetting ]; do sleep 0.05; done
+stty -F /dev/ttyS0 sane 115200
+# -w: setsid forks when already a group leader; without waiting, init would see an exit and start another shell.
+exec setsid -w -c su - player </dev/ttyS0 >/dev/ttyS0 2>&1

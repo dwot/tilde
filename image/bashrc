@@ -1,0 +1,13 @@
+# The game reads the last command you ran from this file when you press Check.
+HISTFILE=/var/game/history
+HISTCONTROL=
+# Timestamps mark where each entry starts, so a multi-line command reads back as one command.
+HISTTIMEFORMAT='%s '
+HISTSIZE=1000
+PROMPT_COMMAND='history -a'
+PS1='\[\e[32m\]\w\[\e[0m\] \$ '
+# Like most distros: your own commands go in ~/bin, which new shells put on PATH once it exists.
+[ -d ~/bin ] && PATH="$HOME/bin:$PATH"
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+cd ~/work 2>/dev/null

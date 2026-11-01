@@ -1,0 +1,42 @@
+#!/bin/bash
+# Runs on ttyS1. The page sends one request per line and gets one reply per line:
+#   request: <id> <base64 bash script>
+#   reply:   \x1e<id> <exit code> <base64 stdout> <base64 stderr>
+# The script runs as root, with helpers for running things the way the player would.
+stty -F /dev/ttyS1 raw -echo 2>/dev/null
+exec </dev/ttyS1 >/dev/ttyS1 2>/dev/null
+
+# The player's files and scratch space live in RAM. It's faster than the 9p root filesystem, and unlike 9p it reports
+# real disk usage, so du works.
+mountpoint -q /home/player/work || mount -t tmpfs -o size=32m,mode=755,uid=$(id -u player),gid=$(id -g player) tmpfs /home/player/work
+mountpoint -q /tmp || mount -t tmpfs -o size=32m,mode=1777 tmpfs /tmp
+
+# as_player <dir> <command>: run a command as the player in a directory, with a time limit.
+as_player() {
+  (cd "$1" && timeout 5 su -s /bin/bash player -c "$2")
+}
+# in_work <dir> <command> [subdir]: like as_player, but <dir> appears at ~/work for the command (a private bind
+# mount), so a check can rerun the player's command on a fresh copy of the files, even if it names ~/work outright.
+# It runs in ~/work/<subdir>, so a command typed after `cd somewhere` reruns from the same place.
+in_work() {
+  unshare -m bash -c 'mount --bind "$1" /home/player/work && cd "/home/player/work/$3" && exec timeout 5 su -s /bin/bash player -c "$2"' _ "$1" "$2" "${3:-}"
+}
+# player_dir: where the player's shell is, relative to ~/work ("" for ~/work itself or anywhere outside it).
+player_dir() {
+  local pid cwd
+  pid=$(pgrep -o -u player -t ttyS0 -x bash) || return 0
+  cwd=$(readlink "/proc/$pid/cwd")
+  case $cwd in /home/player/work/*) printf '%s' "${cwd#/home/player/work/}" ;; esac
+}
+export -f as_player in_work player_dir
+
+printf '\x1eready\n'
+while IFS=' ' read -r id payload; do
+  [ -z "$id" ] && continue
+  script=$(printf '%s' "$payload" | base64 -d)
+  out=$(mktemp) err=$(mktemp)
+  bash -c "$script" >"$out" 2>"$err" </dev/null
+  code=$?
+  printf '\x1e%s %d %s %s\n' "$id" "$code" "$(base64 -w0 <"$out")" "$(base64 -w0 <"$err")"
+  rm -f "$out" "$err"
+done

@@ -1,0 +1,25 @@
+{
+  "name": "tilde",
+  "private": true,
+  "license": "(MIT AND CC-BY-SA-4.0)",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "guest": "image/build.sh",
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && node scripts/notices.mjs 'The Linux that runs in your browser has its own list: /v86/third-party.txt'",
+    "preview": "vite preview",
+    "test": "node tests/run.mjs"
+  },
+  "dependencies": {
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "marked": "^18.1.1",
+    "v86": "^0.5.472"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5"
+  }
+}

@@ -1,0 +1,8 @@
+node_modules
+dist
+public/v86
+.git
+.idea
+public/v86.new
+sources
+site
