@@ -1,4 +1,5 @@
 import "@xterm/xterm/css/xterm.css";
+import "./tokens.css";
 import "./style.css";
 import { Terminal } from "@xterm/xterm";
 import { FitAddon } from "@xterm/addon-fit";
@@ -28,7 +29,7 @@ function showView(v: View) {
 
 function updateStarTotal() {
   const total = Object.values(state.stars).reduce((a, b) => a + b, 0);
-  $("star-total").textContent = `★ ${total}/${levels.length * 3}`;
+  $("star-total").innerHTML = `★ ${total} <span class="muted">/ ${levels.length * 3}</span>`;
 }
 
 /** Cheat sheet entry added by the last first-time solve, highlighted on the next visit. */
@@ -124,7 +125,7 @@ function showMap() {
       </section>`;
   });
 
-  $("map-view").innerHTML = hero + sections.join("") + '<p class="legal"><a href="https://plaintext.guru">plaintext.guru</a> · <a href="https://github.com/dwot/tilde">Source on GitHub</a> · <a href="third-party.txt">Licences</a> · Visits are counted with Cloudflare Web Analytics</p>';
+  $("map-view").innerHTML = hero + sections.join("") + `<p class="legal">Also from plaintext.guru: <a href="https://backtick.plaintext.guru">Backtick</a>, for Markdown</p><p class="legal"><a href="https://github.com/dwot/tilde">Source on GitHub</a> · <a href="third-party.txt">Licences</a> · Visits are counted with Cloudflare Web Analytics</p>`;
   window.scrollTo(0, 0);
 }
 
@@ -336,6 +337,32 @@ $("btn-check").addEventListener("click", async () => {
 
 $("btn-tools").addEventListener("click", () => openHelp(1));
 $("btn-steps").addEventListener("click", () => openHelp(2));
+// ---------- How to play ----------
+
+const modal = $<HTMLDialogElement>("modal");
+modal.querySelector(".close")!.addEventListener("click", () => modal.close());
+modal.addEventListener("click", (e) => e.target === modal && modal.close());
+modal.addEventListener("close", () => {
+  if (!$("level-view").classList.contains("hidden") && !busy) term.focus();
+});
+
+function showHelp() {
+  $("modal-body").innerHTML = `
+    <h2>How to play</h2>
+    <p>Each level gives you a goal and a real bash shell. Linux runs in your browser, so nothing you type leaves the page, and you can't break anything: <b>Start over</b> resets the level.</p>
+    <p>Work in the terminal, then press <b>Check</b>. If a level asks for output, Check reruns your last command.</p>
+    <p>Stars reward working from memory:</p>
+    <div class="help-rows">
+      <div><span class="stars">${starText(3)}</span> No help</div>
+      <div><span class="stars">${starText(2)}</span> You opened the Toolbox</div>
+      <div><span class="stars">${starText(1)}</span> You opened the walkthrough</div>
+    </div>
+    <p>You can replay any level later for more stars. Solved levels add to your cheat sheet.</p>`;
+  if (!modal.open) modal.showModal();
+  $("modal-body").focus();
+}
+
+$("btn-help").addEventListener("click", showHelp);
 $("btn-reset").addEventListener("click", () => {
   if (!current) return;
   $("result").innerHTML = "";
@@ -357,3 +384,4 @@ function route() {
 
 window.addEventListener("hashchange", route);
 route();
+if (!Object.keys(state.stars).length && !Object.keys(state.attempts).length) showHelp();

@@ -8,11 +8,16 @@
   </head>
   <body>
     <header class="top">
-      <a href="#/" class="home"><h1>Tilde</h1></a>
-      <span id="meta" class="meta"></span>
+      <div class="brand">
+        <div class="wordmark">
+          <a class="site collapse" href="https://plaintext.guru">plaintext.guru</a><span class="sep collapse">/</span><a href="#/" class="home"><h1>Tilde</h1></a>
+        </div>
+        <span id="meta" class="meta"></span>
+      </div>
       <nav>
         <a href="#/sheet" id="nav-sheet" class="nav-link">Cheat sheet</a>
         <span id="star-total" class="star-total" title="Stars earned"></span>
+        <button id="btn-help" class="ghost" aria-label="How to play">?</button>
       </nav>
     </header>
 
@@ -46,6 +51,11 @@
         </div>
       </section>
     </main>
+    <dialog id="modal">
+      <button class="close" aria-label="Close">×</button>
+      <div id="modal-body" tabindex="-1"></div>
+    </dialog>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
