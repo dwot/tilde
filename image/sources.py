@@ -12,6 +12,12 @@ import urllib.parse
 
 ALPINE_BRANCH = "3.21"
 DISTFILES = f"https://distfiles.alpinelinux.org/distfiles/v{ALPINE_BRANCH}/"
+# Alpine's mirror for the bulk of it: cloning gitlab.alpinelinux.org failed on GitHub's runners. The mirror can lag,
+# so a commit it doesn't have yet comes straight from Alpine.
+APORTS = "https://github.com/alpinelinux/aports.git"
+ALPINE = ("https://git.alpinelinux.org/aports", "https://gitlab.alpinelinux.org/alpine/aports.git")
+# Recipes whose files don't ship: linux-firmware-none is an empty package, so its huge source isn't needed.
+EMPTY = {"linux-firmware"}
 BIOS = ("seabios-rel-1.16.2.tar.gz", "https://github.com/coreboot/seabios/archive/refs/tags/rel-1.16.2.tar.gz")
 
 manifest, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
@@ -20,7 +26,10 @@ tree.mkdir(parents=True)
 
 
 def run(*args, **kw):
-    return subprocess.run(args, check=True, text=True, capture_output=True, **kw).stdout
+    result = subprocess.run(args, text=True, capture_output=True, **kw)
+    if result.returncode:
+        sys.exit(f"{' '.join(args)} failed:\n{result.stderr}")
+    return result.stdout
 
 
 def fetch(urls, dest):
@@ -35,10 +44,21 @@ body = manifest.read_text().split("-------\n", 1)[1].split("\n\n", 1)[0]
 wanted = sorted({tuple(line.split("  ")[2:4]) for line in body.splitlines()})
 
 run("git", "clone", "-q", "--filter=blob:none", "--no-checkout", "--single-branch", "--branch", f"{ALPINE_BRANCH}-stable",
-    "https://gitlab.alpinelinux.org/alpine/aports.git", "/aports")
+    APORTS, "/aports")
+
+
+
+def has_commit(commit):
+    return subprocess.run(["git", "-C", "/aports", "cat-file", "-e", f"{commit}^{{commit}}"], capture_output=True).returncode == 0
+
 
 problems = []
 for origin, commit in wanted:
+    for url in ALPINE:
+        if has_commit(commit):
+            break
+        print(f"{origin}: fetching {commit[:10]} from {url}", flush=True)
+        subprocess.run(["git", "-C", "/aports", "fetch", "-q", "--depth=1", url, commit])
     repo = next((r for r in ("main", "community")
                  if subprocess.run(["git", "-C", "/aports", "cat-file", "-e", f"{commit}:{r}/{origin}/APKBUILD"],
                                    capture_output=True).returncode == 0), None)
@@ -54,7 +74,7 @@ for origin, commit in wanted:
     script = 'CBUILD=i586-alpine-linux-musl CHOST=$CBUILD CARCH=x86; . ./APKBUILD >/dev/null 2>&1; printf "%s\\n" $source; echo ---; printf "%s\\n" "$sha512sums"'
     sources, _, sums = run("bash", "-c", script, cwd=dest).partition("---\n")
     expected = dict(reversed(l.split()) for l in sums.splitlines() if len(l.split()) == 2)
-    for entry in sources.split():
+    for entry in () if origin in EMPTY else sources.split():
         name, _, url = entry.rpartition("::")
         if "://" not in url:
             continue
@@ -82,3 +102,4 @@ with tarfile.open(out / "tilde-sources.tar", "w") as tar:
     tar.add(tree, arcname="tilde-sources")
 print(f"{len(wanted)} packages, {len(problems)} problems")
 print(*problems, sep="\n")
+sys.exit(1 if problems else 0)

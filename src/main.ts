@@ -124,7 +124,7 @@ function showMap() {
       </section>`;
   });
 
-  $("map-view").innerHTML = hero + sections.join("") + '<p class="legal"><a href="third-party.txt">Licences</a></p>';
+  $("map-view").innerHTML = hero + sections.join("") + '<p class="legal"><a href="https://plaintext.guru">plaintext.guru</a> · <a href="https://github.com/dwot/tilde">Source on GitHub</a> · <a href="third-party.txt">Licences</a></p>';
   window.scrollTo(0, 0);
 }
 
