@@ -152,6 +152,15 @@ dialog kbd { font-family: var(--mono); }
   width: 100%;
 }
 .continue .muted { color: inherit; opacity: 0.7; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; }
+.device-note {
+  width: 100%;
+  margin: 0;
+  padding: 14px 18px;
+  border: 1px solid var(--partial);
+  border-radius: 12px;
+  background: var(--surface);
+  line-height: 1.5;
+}
 .chapter { width: 100%; }
 .chapter-head { display: grid; grid-template-columns: 1fr auto; align-items: baseline; column-gap: 12px; margin-bottom: 12px; }
 .chapter-n { grid-column: 1 / -1; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
