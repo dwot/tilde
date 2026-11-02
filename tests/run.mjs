@@ -38,6 +38,8 @@ function serve(dir) {
     const file = join(dir, normalize(path.endsWith("/") ? path + "index.html" : path));
     try {
       const body = await readFile(file);
+      // On a real connection the snapshot arrives well after a player can open a level.
+      if (file.endsWith(".zst")) await new Promise((r) => setTimeout(r, 2000));
       response.writeHead(200, { "Content-Type": types[extname(file)] ?? "application/octet-stream" }).end(body);
     } catch {
       response.writeHead(404).end();

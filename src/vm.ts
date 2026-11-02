@@ -23,7 +23,7 @@ export class Machine {
   private agentBuf = "";
   private waiting = new Map<string, (r: RunResult) => void>();
   private nextId = 0;
-  private queue: Promise<unknown> = Promise.resolve();
+  private queue: Promise<unknown>;
   private promptWaiters: (() => void)[] = [];
   private tail = "";
   readonly started: Promise<void>;
@@ -80,6 +80,8 @@ export class Machine {
     });
 
     this.started = new Promise((resolve) => this.emu.add_listener("emulator-started", () => resolve()));
+    // Bytes sent before this are lost, and the lost request would hold up every one behind it.
+    this.queue = this.started;
   }
 
   /** Resolves the next time the player's shell shows a prompt. */

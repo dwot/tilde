@@ -3,3 +3,10 @@
 
 /v86/rootfs/*
   Cache-Control: public, max-age=31536000, immutable
+
+# fs.json and the snapshot have to match each other, so always revalidate them.
+/v86/fs.json
+  Cache-Control: public, max-age=0, must-revalidate
+
+/v86/state.bin.zst
+  Cache-Control: public, max-age=0, must-revalidate
