@@ -130,7 +130,7 @@ function showMap() {
     ? `<p class="device-note"><b>Tilde works best with a keyboard.</b> Every level is typed into a real Linux terminal, which is hard going on a phone or tablet. Come back on a computer, or connect a keyboard.</p>`
     : "";
 
-  $("map-view").innerHTML = phone + hero + sections.join("") + `<p class="legal">Also from plaintext.guru: <a href="https://backtick.plaintext.guru">Backtick</a>, for Markdown, and <a href="https://caret.plaintext.guru">Caret</a>, for regular expressions</p><p class="legal"><a href="https://github.com/dwot/tilde">Source on GitHub</a> · <a href="third-party.txt">Licences</a> · Visits are counted with Cloudflare Web Analytics</p>`;
+  $("map-view").innerHTML = phone + hero + sections.join("") + `<p class="legal">Also from plaintext.guru: <a href="https://backtick.plaintext.guru">Backtick</a>, for Markdown, <a href="https://caret.plaintext.guru">Caret</a>, for regular expressions, and <a href="https://hash.plaintext.guru">Hash</a>, for git</p><p class="legal"><a href="https://github.com/dwot/tilde">Source on GitHub</a> · <a href="third-party.txt">Licences</a> · Visits are counted with Cloudflare Web Analytics</p>`;
   window.scrollTo(0, 0);
 }
 
